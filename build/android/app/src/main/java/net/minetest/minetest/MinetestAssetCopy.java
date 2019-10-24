@@ -1,5 +1,6 @@
 package net.minetest.minetest;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.AssetFileDescriptor;
 import android.os.AsyncTask;
@@ -53,14 +54,14 @@ public class MinetestAssetCopy extends Activity {
 		super.onResume();
 		makeFullScreen();
 	}
-	
+
 	@Override
-    	protected void onDestroy() {
+	protected void onDestroy() {
 		super.onDestroy();
 		if (m_AssetCopy != null) {
 			m_AssetCopy.cancel(true);
 		}
-    	}
+	}
 
 	public void makeFullScreen() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -85,7 +86,7 @@ public class MinetestAssetCopy extends Activity {
 		return this;
 	}
 
-	private static class copyAssetTask extends AsyncTask<String, Integer, String> {
+	private class copyAssetTask extends AsyncTask<String, Integer, String> {
 		boolean m_copy_started = false;
 		String m_Foldername = "media";
 		Vector<String> m_foldernames;
@@ -109,6 +110,7 @@ public class MinetestAssetCopy extends Activity {
 			return size;
 		}
 
+		@SuppressLint("WrongThread")
 		@Override
 		protected String doInBackground(String... files) {
 			m_foldernames = new Vector<String>();

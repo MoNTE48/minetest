@@ -1,0 +1,42 @@
+apply plugin: 'com.android.library'
+
+android {
+	compileSdkVersion 29
+	buildToolsVersion "29.0.2"
+	defaultConfig {
+		minSdkVersion 16
+		targetSdkVersion 29
+		externalNativeBuild {
+			ndkBuild {
+				arguments '-j',
+						'APP_STL=c++_shared',
+						'COMPILER_VERSION=clang',
+						'APP_SHORT_COMMANDS=true'
+			}
+		}
+	}
+
+	externalNativeBuild {
+		ndkBuild {
+			path file('jni/Android.mk')
+		}
+	}
+
+	// supported architectures
+	splits {
+		abi {
+			enable true
+			reset()
+			include 'armeabi-v7a', 'arm64-v8a'//, 'x86'
+		}
+	}
+	buildTypes {
+		release {
+			externalNativeBuild {
+				ndkBuild {
+					arguments 'NDEBUG=1'
+				}
+			}
+		}
+	}
+}
