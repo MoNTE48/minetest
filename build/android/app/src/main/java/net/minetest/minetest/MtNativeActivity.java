@@ -11,10 +11,6 @@ public class MtNativeActivity extends NativeActivity {
 
 	static {
 		System.loadLibrary("c++_shared");
-		System.loadLibrary("openal");
-		System.loadLibrary("ogg");
-		System.loadLibrary("vorbis");
-		System.loadLibrary("iconv");
 		System.loadLibrary("minetest");
 	}
 

@@ -73,10 +73,6 @@ doc/mkdocs/mkdocs.yml
 ## Build files
 CMakeFiles
 Makefile
-!build/android/Makefile
-build/android/path.cfg
-build/android/*.apk
-build/android/.externalNativeBuild
 cmake_install.cmake
 CMakeCache.txt
 CPackConfig.cmake
@@ -107,14 +103,15 @@ CMakeDoxy*
 compile_commands.json
 
 ## Android build files
-build/android/src/main/assets
 build/android/build
-build/android/deps
-build/android/libs
-build/android/jni/lib
-build/android/jni/src
-build/android/src/main/jniLibs
-build/android/obj
+build/android/release
 build/android/local.properties
 build/android/.gradle
+build/android/app/src/main/assets
+build/android/app/build
+build/android/native/.*
+build/android/native/build
+build/android/native/deps
 timestamp
+.idea
+.externalNativeBuild

@@ -1,0 +1,65 @@
+apply plugin: 'com.android.application'
+android {
+	compileSdkVersion 29
+	buildToolsVersion "29.0.2"
+
+	defaultConfig {
+		applicationId 'net.minetest.minetest'
+		minSdkVersion 16
+		targetSdkVersion 29
+		versionName "5.1.0"
+		versionCode 24
+	}
+
+	lintOptions {
+		disable "OldTargetApi", "GoogleAppIndexingWarning"
+	}
+
+	Properties props = new Properties()
+	props.load(new FileInputStream(file('../local.properties')))
+
+	if (props.getProperty('keystore') != null) {
+		signingConfigs {
+			release {
+				storeFile file(props['keystore'])
+				storePassword props['keystore.password']
+				keyAlias props['key']
+				keyPassword props['key.password']
+			}
+		}
+
+		buildTypes {
+			release {
+				minifyEnabled false
+				signingConfig signingConfigs.release
+			}
+		}
+	}
+
+// for multiple APKs
+	splits {
+		abi {
+			enable true
+			reset()
+			include 'armeabi-v7a', 'arm64-v8a'//, 'x86'
+		}
+	}
+}
+
+// Map for the version code that gives each ABI a value.
+import com.android.build.OutputFile
+
+def abiCodes = ['armeabi-v7a': 0, 'arm64-v8a': 1 /*, 'x86': 2*/]
+android.applicationVariants.all { variant ->
+	variant.outputs.each {
+		output ->
+			def abiName = output.getFilter(OutputFile.ABI)
+			output.versionCodeOverride = abiCodes.get(abiName, 0) + variant.versionCode
+	}
+}
+
+dependencies {
+	// Minetest Native
+	implementation project(':native')
+	implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+}

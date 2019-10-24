@@ -33,7 +33,7 @@ LOCAL_SRC_FILES := deps/Android/Vorbis/${COMPILER_VERSION}/$(APP_ABI)/libvorbis.
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := Minetest
+LOCAL_MODULE := minetest
 
 LOCAL_CFLAGS += \
 	-DJSONCPP_NO_LOCALE_SUPPORT      \
