@@ -36,6 +36,51 @@ android {
 		}
 	}
 
+	task copyAssets {
+		delete 'src/main/assets'
+		mkdir 'src/main/assets'
+
+		def mtAssetsFolder = "src/main/assets/Minetest"
+		def projRoot = "../../.."
+		def gameToCopy = "minetest_game"
+
+		mkdir "${mtAssetsFolder}"
+		mkdir "${mtAssetsFolder}/client"
+		mkdir "${mtAssetsFolder}/fonts"
+		mkdir "${mtAssetsFolder}/games"
+		mkdir "${mtAssetsFolder}/media"
+
+		copy {
+			from "${projRoot}/minetest.conf.example", "${projRoot}/README.md" into mtAssetsFolder
+		}
+		copy {
+			from "${projRoot}/doc/lgpl-2.1.txt" into "${mtAssetsFolder}"
+			rename ("lgpl-2.1.txt", "LICENSE.txt")
+		}
+
+		copy {
+			from "${projRoot}/builtin" into "${mtAssetsFolder}/builtin"
+		}
+		copy {
+			from "${projRoot}/client/shaders" into "${mtAssetsFolder}/client/shaders"
+		}
+		copy {
+			from "${projRoot}/fonts" include "*.ttf" into "${mtAssetsFolder}/fonts"
+		}
+		copy {
+			from "${projRoot}/games/${gameToCopy}" into "${mtAssetsFolder}/games/${gameToCopy}"
+		}
+		/*copy {
+			from "${projRoot}/po" into "${mtAssetsFolder}/po"
+			// locales broken right now
+			// but I will be fix it later
+		}*/
+		copy {
+			from "${projRoot}/textures" into "${mtAssetsFolder}/textures"
+		}
+	}
+
+
 // for multiple APKs
 	splits {
 		abi {

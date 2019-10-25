@@ -5,9 +5,6 @@ if [ ! -d gradle ]; then
 	exit 1
 fi
 
-FOLDER=$(pwd)/app/src/main/assets
-DEST=$(mktemp -d)
-
 echo
 echo "*** Starting build Minetest for Android... ***"
 
@@ -23,35 +20,6 @@ else
   echo
   echo "Already available, skipping..."
 fi
-
-echo
-echo "=> Creating Assets:"
-
-for dir in builtin textures; do
-	cp -r ../../$dir $DEST/$dir
-done
-
-mkdir -p $DEST/fonts
-cp ../../fonts/DroidSansFallbackFull.ttf $DEST/fonts/ # no PNG fonts because freetype
-
-
-mkdir -p $FOLDER
-
-echo
-echo "** Creating Files.zip"
-ZIPDEST=$FOLDER/Files.zip
-rm -f $ZIPDEST
-cd $DEST; zip -0qr $ZIPDEST -- *
-cd $FOLDER; rm -rf $DEST
-
-###########
-
-cd ../../../../..;
-
-echo "*** Creating games.zip"
-ZIPDEST=$FOLDER/games.zip
-rm -f $ZIPDEST
-zip -0r $ZIPDEST -- games
 
 
 echo
