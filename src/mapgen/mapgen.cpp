@@ -831,7 +831,9 @@ void MapgenBasic::dustTopNodes()
 
 void MapgenBasic::generateCavesNoiseIntersection(s16 max_stone_y)
 {
-	if (node_min.Y > max_stone_y)
+	// cave_width >= 10 is used to disable generation and avoid the intensive
+	// 3D noise calculations. Tunnels already have zero width when cave_width > 1.
+	if (node_min.Y > max_stone_y || cave_width >= 10.0f)
 		return;
 
 	CavesNoiseIntersection caves_noise(ndef, m_bmgr, csize,
@@ -843,18 +845,29 @@ void MapgenBasic::generateCavesNoiseIntersection(s16 max_stone_y)
 
 void MapgenBasic::generateCavesRandomWalk(s16 max_stone_y, s16 large_cave_depth)
 {
-	if (node_min.Y > max_stone_y || node_max.Y > large_cave_depth)
+	if (node_min.Y > max_stone_y)
 		return;
 
 	PseudoRandom ps(blockseed + 21343);
-	u32 bruises_count = ps.range(0, 2);
+	// Small randomwalk caves
+	u32 num_small_caves = ps.range(small_cave_num_min, small_cave_num_max);
 
-	for (u32 i = 0; i < bruises_count; i++) {
+	for (u32 i = 0; i < num_small_caves; i++) {
 		CavesRandomWalk cave(ndef, &gennotify, seed, water_level,
-			c_water_source, c_lava_source, lava_depth, biomegen);
+			c_water_source, c_lava_source, large_cave_flooded, lava_depth, biomegen);
+		cave.makeCave(vm, node_min, node_max, &ps, false, max_stone_y, heightmap);
+	}
 
-		cave.makeCave(vm, node_min, node_max, &ps, true, max_stone_y,
-			heightmap);
+	if (node_max.Y > large_cave_depth)
+		return;
+
+	// Large randomwalk caves below 'large_cave_depth'
+	u32 num_large_caves = ps.range(large_cave_num_min, large_cave_num_max);
+
+	for (u32 i = 0; i < num_large_caves; i++) {
+		CavesRandomWalk cave(ndef, &gennotify, seed, water_level,
+			c_water_source, c_lava_source, large_cave_flooded, lava_depth, biomegen);
+		cave.makeCave(vm, node_min, node_max, &ps, true, max_stone_y, heightmap);
 	}
 }
 

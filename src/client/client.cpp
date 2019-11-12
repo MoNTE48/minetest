@@ -155,6 +155,7 @@ void Client::loadMods()
 	// complain about mods with unsatisfied dependencies
 	if (!modconf.isConsistent()) {
 		modconf.printUnsatisfiedModsError();
+		return;
 	}
 
 	// Print mods
@@ -200,14 +201,30 @@ void Client::scanModSubfolder(const std::string &mod_name, const std::string &mo
 	std::string full_path = mod_path + DIR_DELIM + mod_subpath;
 	std::vector<fs::DirListNode> mod = fs::GetDirListing(full_path);
 	for (const fs::DirListNode &j : mod) {
-		std::string filename = j.name;
 		if (j.dir) {
-			scanModSubfolder(mod_name, mod_path, mod_subpath
-					+ filename + DIR_DELIM);
+			scanModSubfolder(mod_name, mod_path, mod_subpath + j.name + DIR_DELIM);
 			continue;
 		}
-		std::replace( mod_subpath.begin(), mod_subpath.end(), DIR_DELIM_CHAR, '/');
-		m_mod_files[mod_name + ":" + mod_subpath + filename] = full_path  + filename;
+		std::replace(mod_subpath.begin(), mod_subpath.end(), DIR_DELIM_CHAR, '/');
+
+		std::string real_path = full_path + j.name;
+		std::string vfs_path = mod_name + ":" + mod_subpath + j.name;
+		infostream << "Client::scanModSubfolder(): Loading \"" << real_path
+				<< "\" as \"" << vfs_path << "\"." << std::endl;
+
+		std::ifstream is(real_path, std::ios::binary | std::ios::ate);
+		if(!is.good()) {
+			errorstream << "Client::scanModSubfolder(): Can't read file \""
+					<< real_path << "\"." << std::endl;
+			continue;
+		}
+		auto size = is.tellg();
+		std::string contents(size, '\0');
+		is.seekg(0);
+		is.read(&contents[0], size);
+
+		infostream << "  size: " << size << " bytes" << std::endl;
+		m_mod_vfs.emplace(vfs_path, contents);
 	}
 }
 
@@ -1296,7 +1313,7 @@ void Client::removeNode(v3s16 p)
  * @param is_valid_position
  * @return
  */
-MapNode Client::getNode(v3s16 p, bool *is_valid_position)
+MapNode Client::CSMGetNode(v3s16 p, bool *is_valid_position)
 {
 	if (checkCSMRestrictionFlag(CSMRestrictionFlags::CSM_RF_LOOKUP_NODES)) {
 		v3s16 ppos = floatToInt(m_env.getLocalPlayer()->getPosition(), BS);
@@ -1306,6 +1323,31 @@ MapNode Client::getNode(v3s16 p, bool *is_valid_position)
 		}
 	}
 	return m_env.getMap().getNode(p, is_valid_position);
+}
+
+int Client::CSMClampRadius(v3s16 pos, int radius)
+{
+	if (!checkCSMRestrictionFlag(CSMRestrictionFlags::CSM_RF_LOOKUP_NODES))
+		return radius;
+	// This is approximate and will cause some allowed nodes to be excluded
+	v3s16 ppos = floatToInt(m_env.getLocalPlayer()->getPosition(), BS);
+	u32 distance = ppos.getDistanceFrom(pos);
+	if (distance >= m_csm_restriction_noderange)
+		return 0;
+	return std::min<int>(radius, m_csm_restriction_noderange - distance);
+}
+
+v3s16 Client::CSMClampPos(v3s16 pos)
+{
+	if (!checkCSMRestrictionFlag(CSMRestrictionFlags::CSM_RF_LOOKUP_NODES))
+		return pos;
+	v3s16 ppos = floatToInt(m_env.getLocalPlayer()->getPosition(), BS);
+	const int range = m_csm_restriction_noderange;
+	return v3s16(
+		core::clamp<int>(pos.X, (int)ppos.X - range, (int)ppos.X + range),
+		core::clamp<int>(pos.Y, (int)ppos.Y - range, (int)ppos.Y + range),
+		core::clamp<int>(pos.Z, (int)ppos.Z - range, (int)ppos.Z + range)
+	);
 }
 
 void Client::addNode(v3s16 p, MapNode n, bool remove_metadata)
@@ -1864,14 +1906,20 @@ scene::IAnimatedMesh* Client::getMesh(const std::string &filename, bool cache)
 	return mesh;
 }
 
-const std::string* Client::getModFile(const std::string &filename)
+const std::string* Client::getModFile(std::string filename)
 {
-	StringMap::const_iterator it = m_mod_files.find(filename);
-	if (it == m_mod_files.end()) {
-		errorstream << "Client::getModFile(): File not found: \"" << filename
-			<< "\"" << std::endl;
-		return NULL;
-	}
+	// strip dir delimiter from beginning of path
+	auto pos = filename.find_first_of(':');
+	if (pos == std::string::npos)
+		return nullptr;
+	pos++;
+	auto pos2 = filename.find_first_not_of('/', pos);
+	if (pos2 > pos)
+		filename.erase(pos, pos2 - pos);
+
+	StringMap::const_iterator it = m_mod_vfs.find(filename);
+	if (it == m_mod_vfs.end())
+		return nullptr;
 	return &it->second;
 }
 

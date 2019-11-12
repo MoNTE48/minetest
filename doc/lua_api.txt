@@ -1923,6 +1923,11 @@ When displaying text which can contain formspec code, e.g. text set by a player,
 use `minetest.formspec_escape`.
 For coloured text you can use `minetest.colorize`.
 
+Since formspec version 3, elements drawn in the order they are defined. All
+background elements are drawn before all other elements.
+`list` elements are an exception here. They are drawn last. This, however, might
+be changed at any time.
+
 **WARNING**: do _not_ use a element name starting with `key_`; those names are
 reserved to pass key press events to formspec!
 
@@ -2032,6 +2037,7 @@ Elements
   be shown if the inventory list is of size 0.
 * **Note**: With the new coordinate system, the spacing between inventory
   slots is one-fourth the size of an inventory slot.
+* **Note**: Lists are drawn after every other element. This might change at any time.
 
 ### `list[<inventory location>;<list name>;<X>,<Y>;<W>,<H>;<starting item index>]`
 
@@ -2039,6 +2045,7 @@ Elements
   be shown if the inventory list is of size 0.
 * **Note**: With the new coordinate system, the spacing between inventory
   slots is one-fourth the size of an inventory slot.
+* **Note**: Lists are drawn after every other element. This might change at any time.
 
 ### `listring[<inventory location>;<list name>]`
 
@@ -2189,8 +2196,13 @@ Elements
   half a coordinate.  With the old system, newlines are spaced 2/5 of
   an inventory slot.
 
-### `vertlabel[<X>,<Y>;<label>]`
+### `hypertext[<X>,<Y>;<W>,<H>;<name>;<text>]`
+* Displays a static formated text with hyperlinks.
+* `x`, `y`, `w` and `h` work as per field
+* `name` is the name of the field as returned in fields to `on_receive_fields` in case of action in text.
+* `text` is the formatted text using `markup language` described below.
 
+### `vertlabel[<X>,<Y>;<label>]`
 * Textual label drawn vertically
 * `label` is the text on the label
 * **Note**: If the new coordinate system is enabled, vertlabels are
@@ -2534,6 +2546,110 @@ Some types may inherit styles from parent types.
     * noclip - boolean, set to true to allow the element to exceed formspec bounds.
     * textcolor - color. Default white.
 
+Markup language
+---------------
+
+Markup language used in `hypertext[]` elements uses tag that look like HTML tags. Some
+tags can enclose text, they open with `<tagname>` and close with `</tagname>`.
+Tags can have attributes, in that case, attributes are in the opening tag in
+form of a key/value separated with equal signs. Attribute values should not be quoted.
+
+These are the technically basic tags but see below for usual tags. Base tags are:
+
+`<style color=... font=... size=...>...</style>`
+
+Changes the style of the text.
+
+* `color`: Text color. Given color is a `colorspec`.
+* `size`: Text size.
+* `font`: Text font (`mono` or `normal`).
+
+`<global background=... margin=... valign=... color=... hovercolor=... size=... font=... halign=... >`
+
+Sets global style.
+
+Global only styles:
+* `background`: Text background, a `colorspec` or `none`.
+* `margin`: Page margins in pixel.
+* `valign`: Text vertical alignment (`top`, `middle`, `bottom`).
+
+Inheriting styles (affects child elements):
+* `color`: Default text color. Given color is a `colorspec`.
+* `hovercolor`: Color of <action> tags when mouse is over.
+* `size`: Default text size.
+* `font`: Default text font (`mono` or `normal`).
+* `halign`: Default text horizontal alignment (`left`, `right`, `center`, `justify`).
+
+This tag needs to be placed only once as it changes the global settings of the
+text. Anyway, if several tags are placed, each changed will be made in the order
+tags appear.
+
+`<tag name=... color=... hovercolor=... font=... size=...>`
+
+Defines or redefines tag style. This can be used to define new tags.
+* `name`: Name of the tag to define or change.
+* `color`: Text color. Given color is a `colorspec`.
+* `hovercolor`: Text color when element hovered (only for `action` tags). Given color is a `colorspec`.
+* `size`: Text size.
+* `font`: Text font (`mono` or `normal`).
+
+Following tags are the usual tags for text layout. They are defined by default.
+Other tags can be added using `<tag ...>` tag.
+
+`<normal>...</normal>`: Normal size text
+
+`<big>...</big>`: Big text
+
+`<bigger>...</bigger>`: Bigger text
+
+`<center>...</center>`: Centered text
+
+`<left>...</left>`: Left-aligned text
+
+`<right>...</right>`: Right-aligned text
+
+`<justify>...</justify>`: Justified text
+
+`<mono>...</mono>`: Monospaced font
+
+`<b>...</b>`, `<i>...</i>`, `<u>...</u>`: Bold, italic, underline styles.
+
+`<action name=...>...</action>`
+
+Make that text a clickable text triggering an action.
+
+* `name`: Name of the action (mandatory).
+
+When clicked, the formspec is send to the server. The value of the text field
+sent to `on_player_receive_fields` will be "action:" concatenated to the action
+name.
+
+`<img name=... float=... width=... height=...>`
+
+Draws an image which is present in the client media cache.
+
+* `name`: Name of the texture (mandatory).
+* `float`: If present, makes the image floating (`left` or `right`).
+* `width`: Force image width instead of taking texture width.
+* `height`: Force image height instead of taking texture height.
+
+If only width or height given, texture aspect is kept.
+
+`<item name=... float=... width=... height=... rotate=...>`
+
+Draws an item image.
+
+* `name`: Item string of the item to draw (mandatory).
+* `float`: If present, makes the image floating (`left` or `right`).
+* `width`: Item image width.
+* `height`: Item image height.
+* `rotate`: Rotate item image if set to `yes` or `X,Y,Z`. X, Y and Z being
+rotation speeds in percent of standard speed (-1000 to 1000). Works only if
+`inventory_items_animations` is set to true.
+* `angle`: Angle in which the item image is shown. Value has `X,Y,Z` form.
+X, Y and Z being angles around each three axes. Works only if
+`inventory_items_animations` is set to true.
+
 Inventory
 =========
 
@@ -2556,7 +2672,6 @@ Player Inventory lists
 * `hand`: list containing an override for the empty hand
     * Is not created automatically, use `InvRef:set_size`
     * Is only used to enhance the empty hand's tool capabilities
-
 
 Colors
 ======
@@ -4788,13 +4903,16 @@ Server
 Bans
 ----
 
-* `minetest.get_ban_list()`: returns the ban list
-  (same as `minetest.get_ban_description("")`).
-* `minetest.get_ban_description(ip_or_name)`: returns ban description (string)
-* `minetest.ban_player(name)`: ban a player
-* `minetest.unban_player_or_ip(name)`: unban player or IP address
-* `minetest.kick_player(name, [reason])`: disconnect a player with a optional
+* `minetest.get_ban_list()`: returns a list of all bans formatted as string
+* `minetest.get_ban_description(ip_or_name)`: returns list of bans matching
+  IP address or name formatted as string
+* `minetest.ban_player(name)`: ban the IP of a currently connected player
+    * Returns boolean indicating success
+* `minetest.unban_player_or_ip(ip_or_name)`: remove ban record matching
+  IP address or name
+* `minetest.kick_player(name, [reason])`: disconnect a player with an optional
   reason.
+    * Returns boolean indicating success (false if player nonexistant)
 
 Particles
 ---------
@@ -6314,9 +6432,9 @@ Used by `minetest.register_node`, `minetest.register_craftitem`, and
         -- default: minetest.item_place
 
         on_secondary_use = function(itemstack, user, pointed_thing),
-        -- Same as on_place but called when pointing at nothing.
+        -- Same as on_place but called when not pointing at a node.
         -- The user may be any ObjectRef or nil.
-        -- pointed_thing: always { type = "nothing" }
+        -- default: nil
 
         on_drop = function(itemstack, dropper, pos),
         -- Shall drop item and return the leftover itemstack.
