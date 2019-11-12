@@ -82,6 +82,7 @@ public class MinetestAssetCopy extends Activity {
 		return this;
 	}
 
+	@SuppressLint("StaticFieldLeak")
 	private class copyAssetTask extends AsyncTask<String, Integer, String> {
 		boolean m_copy_started = false;
 		String m_Foldername = "media";
@@ -106,7 +107,6 @@ public class MinetestAssetCopy extends Activity {
 			return size;
 		}
 
-		@SuppressLint("WrongThread")
 		@Override
 		protected String doInBackground(String... files) {
 			m_foldernames = new Vector<>();

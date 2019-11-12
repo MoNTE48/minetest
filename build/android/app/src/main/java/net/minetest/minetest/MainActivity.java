@@ -55,15 +55,13 @@ public class MainActivity extends Activity {
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
 	                                       @NonNull int[] grantResults) {
-		switch (requestCode) {
-			case PERMISSIONS:
-				for (int index = 0; index < permissions.length; index++) {
-					if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
-						// permission not granted - toast and exit
-						Toast.makeText(this, R.string.not_granted, Toast.LENGTH_LONG).show();
-						finish();
-						return;
-					}
+		if (requestCode == PERMISSIONS) {
+			for (int index = 0; index < permissions.length; index++) {
+				if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
+					// permission not granted - toast and exit
+					Toast.makeText(this, R.string.not_granted, Toast.LENGTH_LONG).show();
+					finish();
+					return;
 				}
 			}
 			// permission were granted - run
