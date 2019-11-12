@@ -2,7 +2,7 @@ APP_PLATFORM := ${APP_PLATFORM}
 APP_ABI := ${TARGET_ABI}
 APP_STL := ${APP_STL}
 NDK_TOOLCHAIN_VERSION := $(COMPILER_VERSION)
-APP_MODULES := minetest
+APP_MODULES := Minetest
 
 APP_CPPFLAGS := -Ofast -fvisibility=hidden -fexceptions -Wno-deprecated-declarations -Wno-extra-tokens
 

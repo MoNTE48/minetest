@@ -1,18 +1,14 @@
 apply plugin: 'com.android.application'
 android {
 	compileSdkVersion 29
-	buildToolsVersion "29.0.2"
+	buildToolsVersion '29.0.2'
 
 	defaultConfig {
 		applicationId 'net.minetest.minetest'
 		minSdkVersion 16
 		targetSdkVersion 29
-		versionName "5.1.0"
+		versionName '5.1.0'
 		versionCode 24
-	}
-
-	lintOptions {
-		disable "OldTargetApi", "GoogleAppIndexingWarning"
 	}
 
 	Properties props = new Properties()
@@ -36,7 +32,7 @@ android {
 		}
 	}
 
-	task copyAssets {
+	task copyAssets (type:Exec){
 		delete 'src/main/assets'
 		mkdir 'src/main/assets'
 
@@ -78,16 +74,22 @@ android {
 		copy {
 			from "${projRoot}/textures" into "${mtAssetsFolder}/textures"
 		}
+
+		commandLine 'cd src/main/assets && find -L Minetest > filelist.txt'
 	}
 
-
-// for multiple APKs
+	// for multiple APKs
 	splits {
 		abi {
 			enable true
 			reset()
 			include 'armeabi-v7a', 'arm64-v8a'//, 'x86'
 		}
+	}
+
+	compileOptions {
+		sourceCompatibility = 1.8
+		targetCompatibility = 1.8
 	}
 }
 
@@ -106,5 +108,5 @@ android.applicationVariants.all { variant ->
 dependencies {
 	// Minetest Native
 	implementation project(':native')
-	implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+	implementation 'androidx.core:core:1.1.0'
 }

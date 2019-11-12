@@ -7,10 +7,10 @@ LOCAL_MODULE := Irrlicht
 LOCAL_SRC_FILES := deps/Android/Irrlicht/${COMPILER_VERSION}/$(APP_ABI)/libIrrlicht.a
 include $(PREBUILT_STATIC_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := LevelDB
-LOCAL_SRC_FILES := deps/Android/LevelDB/${COMPILER_VERSION}/$(APP_ABI)/libleveldb.a
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := LevelDB
+#LOCAL_SRC_FILES := deps/Android/LevelDB/${COMPILER_VERSION}/$(APP_ABI)/libleveldb.a
+#include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := Curl
@@ -33,7 +33,7 @@ LOCAL_SRC_FILES := deps/Android/Vorbis/${COMPILER_VERSION}/$(APP_ABI)/libvorbis.
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := minetest
+LOCAL_MODULE := Minetest
 
 LOCAL_CFLAGS += \
 	-DJSONCPP_NO_LOCALE_SUPPORT      \
@@ -42,7 +42,7 @@ LOCAL_CFLAGS += \
 	-DUSE_CURL=1                     \
 	-DUSE_SOUND=1                    \
 	-DUSE_FREETYPE=1                 \
-	-DUSE_LEVELDB=1                  \
+	-DUSE_LEVELDB=0                  \
 	$(GPROF_DEF)
 
 ifdef NDEBUG
@@ -62,14 +62,14 @@ LOCAL_C_INCLUDES := \
 		../../../lib/lua/src                           \
 		../../../lib/jsoncpp                           \
 		../../../src/cguittfont                        \
-		deps/Android/irrlicht/include                  \
+		deps/Android/Irrlicht/include                  \
 		deps/Android/libiconv/include                  \
 		deps/Android/libiconv/libcharset/include       \
 		deps/Android/Freetype/include                  \
 		deps/Android/Curl/include                      \
 		deps/Android/OpenAL-Soft/include               \
 		deps/Android/Vorbis/include                    \
-		deps/Android/leveldb/include                   \
+		deps/Android/LevelDB/include                   \
 		deps/Android/sqlite/
 
 LOCAL_SRC_FILES := \
@@ -143,23 +143,6 @@ LOCAL_SRC_FILES := \
 		../../../src/filesys.cpp                       \
 		../../../src/genericobject.cpp                 \
 		../../../src/gettext.cpp                       \
-		../../../src/gui/guiButton.cpp                 \
-		../../../src/gui/guiChatConsole.cpp            \
-		../../../src/gui/guiConfirmRegistration.cpp    \
-		../../../src/gui/guiEditBoxWithScrollbar.cpp   \
-		../../../src/gui/guiEngine.cpp                 \
-		../../../src/gui/guiFormSpecMenu.cpp           \
-		../../../src/gui/guiKeyChangeMenu.cpp          \
-		../../../src/gui/guiPasswordChange.cpp         \
-		../../../src/gui/guiPathSelectMenu.cpp         \
-		../../../src/gui/guiScrollBar.cpp              \
-		../../../src/gui/guiSkin.cpp                   \
-		../../../src/gui/guiTable.cpp                  \
-		../../../src/gui/guiVolumeChange.cpp           \
-		../../../src/gui/intlGUIEditBox.cpp            \
-		../../../src/gui/modalMenu.cpp                 \
-		../../../src/gui/profilergraph.cpp             \
-		../../../src/gui/touchscreengui.cpp            \
 		../../../src/httpfetch.cpp                     \
 		../../../src/hud.cpp                           \
 		../../../src/inventory.cpp                     \
@@ -223,29 +206,6 @@ LOCAL_SRC_FILES := \
 		../../../src/tileanimation.cpp                 \
 		../../../src/tool.cpp                          \
 		../../../src/translation.cpp                   \
-		../../../src/unittest/test_authdatabase.cpp    \
-		../../../src/unittest/test_collision.cpp       \
-		../../../src/unittest/test_compression.cpp     \
-		../../../src/unittest/test_connection.cpp      \
-		../../../src/unittest/test.cpp                 \
-		../../../src/unittest/test_filepath.cpp        \
-		../../../src/unittest/test_gameui.cpp          \
-		../../../src/unittest/test_inventory.cpp       \
-		../../../src/unittest/test_mapnode.cpp         \
-		../../../src/unittest/test_map_settings_manager.cpp \
-		../../../src/unittest/test_nodedef.cpp         \
-		../../../src/unittest/test_noderesolver.cpp    \
-		../../../src/unittest/test_noise.cpp           \
-		../../../src/unittest/test_objdef.cpp          \
-		../../../src/unittest/test_profiler.cpp        \
-		../../../src/unittest/test_random.cpp          \
-		../../../src/unittest/test_schematic.cpp       \
-		../../../src/unittest/test_serialization.cpp   \
-		../../../src/unittest/test_settings.cpp        \
-		../../../src/unittest/test_socket.cpp          \
-		../../../src/unittest/test_utilities.cpp       \
-		../../../src/unittest/test_voxelalgorithms.cpp \
-		../../../src/unittest/test_voxelmanipulator.cpp\
 		../../../src/util/areastore.cpp                \
 		../../../src/util/auth.cpp                     \
 		../../../src/util/base64.cpp                   \
@@ -265,73 +225,15 @@ LOCAL_SRC_FILES := \
 		../../../src/voxelalgorithms.cpp               \
 		../../../src/voxel.cpp
 
-# Network
-LOCAL_SRC_FILES += \
-		../../../src/network/address.cpp               \
-		../../../src/network/connection.cpp            \
-		../../../src/network/networkpacket.cpp         \
-		../../../src/network/clientopcodes.cpp         \
-		../../../src/network/clientpackethandler.cpp   \
-		../../../src/network/connectionthreads.cpp     \
-		../../../src/network/serveropcodes.cpp         \
-		../../../src/network/serverpackethandler.cpp   \
-		../../../src/network/socket.cpp                \
+# GUI
+LOCAL_SRC_FILES += $(wildcard  ../../../src/gui/*.cpp)
 
-# lua api
-LOCAL_SRC_FILES += \
-		../../../src/script/common/c_content.cpp       \
-		../../../src/script/common/c_converter.cpp     \
-		../../../src/script/common/c_internal.cpp      \
-		../../../src/script/common/c_types.cpp         \
-		../../../src/script/common/helper.cpp          \
-		../../../src/script/cpp_api/s_async.cpp        \
-		../../../src/script/cpp_api/s_base.cpp         \
-		../../../src/script/cpp_api/s_client.cpp       \
-		../../../src/script/cpp_api/s_entity.cpp       \
-		../../../src/script/cpp_api/s_env.cpp          \
-		../../../src/script/cpp_api/s_inventory.cpp    \
-		../../../src/script/cpp_api/s_item.cpp         \
-		../../../src/script/cpp_api/s_mainmenu.cpp     \
-		../../../src/script/cpp_api/s_modchannels.cpp  \
-		../../../src/script/cpp_api/s_node.cpp         \
-		../../../src/script/cpp_api/s_nodemeta.cpp     \
-		../../../src/script/cpp_api/s_player.cpp       \
-		../../../src/script/cpp_api/s_security.cpp     \
-		../../../src/script/cpp_api/s_server.cpp       \
-		../../../src/script/lua_api/l_areastore.cpp    \
-		../../../src/script/lua_api/l_auth.cpp         \
-		../../../src/script/lua_api/l_base.cpp         \
-		../../../src/script/lua_api/l_camera.cpp       \
-		../../../src/script/lua_api/l_client.cpp       \
-		../../../src/script/lua_api/l_craft.cpp        \
-		../../../src/script/lua_api/l_env.cpp          \
-		../../../src/script/lua_api/l_inventory.cpp    \
-		../../../src/script/lua_api/l_item.cpp         \
-		../../../src/script/lua_api/l_itemstackmeta.cpp\
-		../../../src/script/lua_api/l_localplayer.cpp  \
-		../../../src/script/lua_api/l_mainmenu.cpp     \
-		../../../src/script/lua_api/l_mapgen.cpp       \
-		../../../src/script/lua_api/l_metadata.cpp     \
-		../../../src/script/lua_api/l_minimap.cpp      \
-		../../../src/script/lua_api/l_modchannels.cpp  \
-		../../../src/script/lua_api/l_nodemeta.cpp     \
-		../../../src/script/lua_api/l_nodetimer.cpp    \
-		../../../src/script/lua_api/l_noise.cpp        \
-		../../../src/script/lua_api/l_object.cpp       \
-		../../../src/script/lua_api/l_playermeta.cpp   \
-		../../../src/script/lua_api/l_particles.cpp    \
-		../../../src/script/lua_api/l_particles_local.cpp\
-		../../../src/script/lua_api/l_rollback.cpp     \
-		../../../src/script/lua_api/l_server.cpp       \
-		../../../src/script/lua_api/l_settings.cpp     \
-		../../../src/script/lua_api/l_sound.cpp        \
-		../../../src/script/lua_api/l_http.cpp         \
-		../../../src/script/lua_api/l_storage.cpp      \
-		../../../src/script/lua_api/l_util.cpp         \
-		../../../src/script/lua_api/l_vmanip.cpp       \
-		../../../src/script/scripting_client.cpp       \
-		../../../src/script/scripting_server.cpp       \
-		../../../src/script/scripting_mainmenu.cpp
+# Network
+LOCAL_SRC_FILES += $(wildcard  ../../../src/network/*.cpp)
+
+# Lua API
+LOCAL_SRC_FILES += $(wildcard  ../../../src/script/*.cpp)
+LOCAL_SRC_FILES += $(wildcard  ../../../src/script/*/*.cpp)
 
 # Freetype2 support
 #LOCAL_SRC_FILES += ../../../src/cguittfont/xCGUITTFont.cpp
@@ -376,10 +278,7 @@ LOCAL_SRC_FILES += \
 LOCAL_SRC_FILES += deps/Android/sqlite/sqlite3.c
 
 # Threading
-LOCAL_SRC_FILES += \
-		../../../src/threading/event.cpp             \
-		../../../src/threading/semaphore.cpp         \
-		../../../src/threading/thread.cpp
+LOCAL_SRC_FILES += $(wildcard  ../../../src/threading/*.cpp)
 
 # JSONCPP
 LOCAL_SRC_FILES += ../../../lib/jsoncpp/jsoncpp.cpp
@@ -389,7 +288,7 @@ LOCAL_SRC_FILES += \
 	deps/Android/libiconv/lib/iconv.c               \
 	deps/Android/libiconv/libcharset/lib/localcharset.c
 
-LOCAL_STATIC_LIBRARIES += Irrlicht LevelDB Curl Freetype OpenAL Vorbis android_native_app_glue $(PROFILER_LIBS)
+LOCAL_STATIC_LIBRARIES += Irrlicht Curl Freetype OpenAL Vorbis android_native_app_glue $(PROFILER_LIBS) #LevelDB
 
 LOCAL_LDLIBS := -lEGL -lGLESv1_CM -lGLESv2 -landroid -lOpenSLES
 
