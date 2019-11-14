@@ -40,7 +40,7 @@
 			</intent-filter>
 			<meta-data
 				android:name="android.app.lib_name"
-				android:value="minetest" />
+				android:value="Minetest" />
 		</activity>
 		<activity
 			android:name=".MinetestTextEntry"

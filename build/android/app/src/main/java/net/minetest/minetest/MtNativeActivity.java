@@ -11,7 +11,7 @@ public class MtNativeActivity extends NativeActivity {
 
 	static {
 		System.loadLibrary("c++_shared");
-		System.loadLibrary("minetest");
+		System.loadLibrary("Minetest");
 	}
 
 	private int m_MessagReturnCode;
@@ -31,6 +31,12 @@ public class MtNativeActivity extends NativeActivity {
 	protected void onResume() {
 		super.onResume();
 		makeFullScreen();
+	}
+
+	@Override
+	public void onBackPressed() {
+		// I do not let the native stop by pressing the back button! No one knew that I could do this so simply.
+		// Without patches Irrlicht. Without hacking the native code.
 	}
 
 	private void makeFullScreen() {
