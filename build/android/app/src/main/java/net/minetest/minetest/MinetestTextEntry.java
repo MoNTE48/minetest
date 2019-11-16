@@ -1,86 +1,83 @@
+/*
+Minetest
+Copyright (C) 2014-2019 MoNTE48, Maksim Gamarnik <MoNTE48@mail.ua>
+Copyright (C) 2014-2019 ubulem,  Bektur Mambetov <berkut87@gmail.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+
 package net.minetest.minetest;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.KeyEvent;
-import android.view.View;
-import android.view.View.OnKeyListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-public class MinetestTextEntry extends Activity {
-	private final int MultiLineTextInput = 1;
-	private final int SingleLineTextInput = 2;
-	private final int SingleLinePasswordInput = 3;
-	private AlertDialog mTextInputDialog;
-	private EditText mTextInputWidget;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Objects;
+
+public class MinetestTextEntry extends AppCompatActivity {
+	private androidx.appcompat.app.AlertDialog mTextInputDialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Bundle b = getIntent().getExtras();
-		String acceptButton = b.getString("EnterButton");
+		int editType = Objects.requireNonNull(b).getInt("editType");
 		String hint = b.getString("hint");
 		String current = b.getString("current");
-		int editType = b.getInt("editType");
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		mTextInputWidget = new EditText(this);
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		EditText mTextInputWidget = new EditText(this);
+		builder.setView(mTextInputWidget);
+		mTextInputWidget.requestFocus();
 		mTextInputWidget.setHint(hint);
 		mTextInputWidget.setText(current);
-		mTextInputWidget.setMinWidth(300);
-		if (editType == SingleLinePasswordInput) {
-			mTextInputWidget.setInputType(InputType.TYPE_CLASS_TEXT |
-					InputType.TYPE_TEXT_VARIATION_PASSWORD);
-		} else {
+		final InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+		Objects.requireNonNull(imm).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+		if (editType == 3)
+			mTextInputWidget.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		else
 			mTextInputWidget.setInputType(InputType.TYPE_CLASS_TEXT);
-		}
-
-		builder.setView(mTextInputWidget);
-
-		if (editType == MultiLineTextInput) {
-			builder.setPositiveButton(acceptButton, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					pushResult(mTextInputWidget.getText().toString());
-				}
-			});
-		}
-
-		builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-			public void onCancel(DialogInterface dialog) {
-				cancelDialog();
+		mTextInputWidget.setOnKeyListener((view, KeyCode, event) -> {
+			if (KeyCode == KeyEvent.KEYCODE_ENTER) {
+				imm.hideSoftInputFromWindow(mTextInputWidget.getWindowToken(), 0);
+				pushResult(mTextInputWidget.getText().toString());
+				return true;
 			}
+			return false;
 		});
-
-		mTextInputWidget.setOnKeyListener(new OnKeyListener() {
-			@Override
-			public boolean onKey(View view, int KeyCode, KeyEvent event) {
-				if (KeyCode == KeyEvent.KEYCODE_ENTER) {
-
-					pushResult(mTextInputWidget.getText().toString());
-					return true;
-				}
-				return false;
-			}
-		});
-
 		mTextInputDialog = builder.create();
-		mTextInputDialog.show();
+		if (!isFinishing())
+			mTextInputDialog.show();
+		mTextInputDialog.setOnCancelListener(dialog -> {
+			pushResult(mTextInputWidget.getText().toString());
+			setResult(Activity.RESULT_CANCELED);
+			mTextInputDialog.dismiss();
+			finish();
+		});
 	}
 
 	private void pushResult(String text) {
 		Intent resultData = new Intent();
 		resultData.putExtra("text", text);
-		setResult(Activity.RESULT_OK, resultData);
-		mTextInputDialog.dismiss();
-		finish();
-	}
-
-	private void cancelDialog() {
-		setResult(Activity.RESULT_CANCELED);
+		setResult(AppCompatActivity.RESULT_OK, resultData);
 		mTextInputDialog.dismiss();
 		finish();
 	}

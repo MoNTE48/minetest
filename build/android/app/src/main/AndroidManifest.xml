@@ -8,9 +8,11 @@
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 	<application
+		android:allowBackup="false"
 		android:icon="@mipmap/ic_launcher"
-		android:label="Minetest"
-		android:resizeableActivity="false">
+		android:label="@string/label"
+		android:resizeableActivity="false"
+		tools:targetApi="n">
 
 		<meta-data
 			android:name="android.max_aspect"
@@ -29,7 +31,7 @@
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".MtNativeActivity"
+			android:name=".GameActivity"
 			android:configChanges="orientation|keyboard|keyboardHidden|navigation|screenSize|smallestScreenSize"
 			android:hardwareAccelerated="true"
 			android:launchMode="singleTask"
@@ -47,9 +49,10 @@
 			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:theme="@style/Theme.Dialog"
 			android:windowSoftInputMode="stateAlwaysHidden" />
-		<activity
-			android:name=".MinetestAssetCopy"
-			android:screenOrientation="sensorLandscape"
-			android:theme="@style/AppTheme" />
+
+		<service
+			android:name=".UnzipService"
+			android:enabled="true"
+			android:exported="false" />
 	</application>
 </manifest>

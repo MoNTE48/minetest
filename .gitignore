@@ -105,11 +105,11 @@ compile_commands.json
 
 ## Android build files
 build/android/build
-build/android/release
 build/android/local.properties
 build/android/.gradle
-build/android/app/src/main/assets
 build/android/app/build
+build/android/app/release
+build/android/app/src/main/assets
 build/android/native/.*
 build/android/native/build
 build/android/native/deps

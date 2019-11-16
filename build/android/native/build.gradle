@@ -1,4 +1,3 @@
-import org.ajoberstar.gradle.git.tasks.*
 apply plugin: 'com.android.library'
 
 android {
@@ -10,7 +9,7 @@ android {
 		externalNativeBuild {
 			ndkBuild {
 				arguments '-j',
-						'APP_STL=c++_shared',
+						'APP_STL=c++_static',
 						'COMPILER_VERSION=clang',
 						'APP_SHORT_COMMANDS=true'
 			}
@@ -43,9 +42,12 @@ android {
 	}
 }
 
+
+import org.ajoberstar.gradle.git.tasks.GitClone
+
 task cloneGitRepo(type: GitClone) {
 	def destination = file('deps')
-	uri ='https://github.com/MultiCraft/deps'
+	uri = 'https://github.com/MultiCraft/deps'
 	destinationPath = destination
 	bare = false
 	enabled = !destination.exists()

@@ -7,10 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 
-public class MtNativeActivity extends NativeActivity {
-
+public class GameActivity extends NativeActivity {
 	static {
-		System.loadLibrary("c++_shared");
 		System.loadLibrary("Minetest");
 	}
 
@@ -35,8 +33,6 @@ public class MtNativeActivity extends NativeActivity {
 
 	@Override
 	public void onBackPressed() {
-		// I do not let the native stop by pressing the back button! No one knew that I could do this so simply.
-		// Without patches Irrlicht. Without hacking the native code.
 	}
 
 	private void makeFullScreen() {
@@ -52,14 +48,7 @@ public class MtNativeActivity extends NativeActivity {
 			makeFullScreen();
 	}
 
-	public void copyAssets() {
-		Intent intent = new Intent(this, MinetestAssetCopy.class);
-		startActivity(intent);
-	}
-
-	public void showDialog(String acceptButton, String hint, String current,
-	                       int editType) {
-
+	public void showDialog(String acceptButton, String hint, String current, int editType) {
 		Intent intent = new Intent(this, MinetestTextEntry.class);
 		Bundle params = new Bundle();
 		params.putString("acceptButton", acceptButton);
@@ -72,7 +61,7 @@ public class MtNativeActivity extends NativeActivity {
 		m_MessagReturnCode = -1;
 	}
 
-	/* ugly code to workaround putMessageBoxResult not beeing found */
+	// ugly code to workaround putMessageBoxResult not beeing found
 	public int getDialogState() {
 		return m_MessagReturnCode;
 	}
@@ -95,16 +84,14 @@ public class MtNativeActivity extends NativeActivity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode,
-	                                Intent data) {
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 101) {
 			if (resultCode == RESULT_OK) {
 				String text = data.getStringExtra("text");
 				m_MessagReturnCode = 0;
 				m_MessageReturnValue = text;
-			} else {
+			} else
 				m_MessagReturnCode = 1;
-			}
 		}
 	}
 }

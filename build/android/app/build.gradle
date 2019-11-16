@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 android {
 	compileSdkVersion 29
 	buildToolsVersion '29.0.2'
-
 	defaultConfig {
 		applicationId 'net.minetest.minetest'
 		minSdkVersion 16
@@ -26,7 +25,7 @@ android {
 
 		buildTypes {
 			release {
-				minifyEnabled false
+				minifyEnabled true
 				signingConfig signingConfigs.release
 			}
 		}
@@ -42,8 +41,8 @@ android {
 	}
 
 	compileOptions {
-		sourceCompatibility = 1.8
-		targetCompatibility = 1.8
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
 	}
 }
 
@@ -57,7 +56,7 @@ task prepareAssets() {
 	}
 	copy {
 		from "${projRoot}/doc/lgpl-2.1.txt" into "${assetsFolder}"
-		rename ("lgpl-2.1.txt", "LICENSE.txt")
+		rename("lgpl-2.1.txt", "LICENSE.txt")
 	}
 	copy {
 		from "${projRoot}/builtin" into "${assetsFolder}/builtin"
@@ -80,7 +79,7 @@ task prepareAssets() {
 		from "${projRoot}/textures" into "${assetsFolder}/textures"
 	}
 
-	task zipAssets(type:Zip) {
+	task zipAssets(type: Zip) {
 		archiveName "Minetest.zip"
 		from "${assetsFolder}"
 		destinationDir file("src/main/assets")
@@ -91,6 +90,7 @@ preBuild.dependsOn zipAssets
 
 // Map for the version code that gives each ABI a value.
 import com.android.build.OutputFile
+
 def abiCodes = ['armeabi-v7a': 0, 'arm64-v8a': 1 /*, 'x86': 2*/]
 android.applicationVariants.all { variant ->
 	variant.outputs.each {
@@ -104,4 +104,5 @@ dependencies {
 	// Minetest Native
 	implementation project(':native')
 	implementation 'androidx.core:core:1.1.0'
+	implementation 'androidx.appcompat:appcompat:1.1.0'
 }
