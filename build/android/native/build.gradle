@@ -11,7 +11,10 @@ android {
 				arguments '-j',
 						'APP_STL=c++_static',
 						'COMPILER_VERSION=clang',
-						'APP_SHORT_COMMANDS=true'
+						'APP_SHORT_COMMANDS=true',
+						"versionMajor=${versionMajor}",
+						"versionMinor=${versionMinor}",
+						"versionPatch=${versionPatch}"
 			}
 		}
 	}

@@ -6,8 +6,8 @@ android {
 		applicationId 'net.minetest.minetest'
 		minSdkVersion 16
 		targetSdkVersion 29
-		versionName '5.1.0'
-		versionCode 24
+		versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+		versionCode project.versionCode
 	}
 
 	Properties props = new Properties()
@@ -36,7 +36,7 @@ android {
 		abi {
 			enable true
 			reset()
-			include 'armeabi-v7a', 'arm64-v8a'//, 'x86'
+			include 'armeabi-v7a', 'arm64-v8a'
 		}
 	}
 
@@ -72,7 +72,7 @@ task prepareAssets() {
 	}
 	/*copy {
 		// locales broken right now
-		// but I will be fix it later
+		// ToDo: fix it!
 		from "${projRoot}/po" into "${assetsFolder}/po"
 	}*/
 	copy {
@@ -91,7 +91,7 @@ preBuild.dependsOn zipAssets
 // Map for the version code that gives each ABI a value.
 import com.android.build.OutputFile
 
-def abiCodes = ['armeabi-v7a': 0, 'arm64-v8a': 1 /*, 'x86': 2*/]
+def abiCodes = ['armeabi-v7a': 0, 'arm64-v8a': 1]
 android.applicationVariants.all { variant ->
 	variant.outputs.each {
 		output ->
@@ -101,7 +101,6 @@ android.applicationVariants.all { variant ->
 }
 
 dependencies {
-	// Minetest Native
 	implementation project(':native')
 	implementation 'androidx.core:core:1.1.0'
 	implementation 'androidx.appcompat:appcompat:1.1.0'

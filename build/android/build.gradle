@@ -1,5 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+project.ext.set("versionMajor", 5) // Version Major
+project.ext.set("versionMinor", 2) // Version Minor
+project.ext.set("versionPatch", 0) // Version Patch
+project.ext.set("versionCode", 24) // Android Version Code, +2 after each release!
+
 buildscript {
 	repositories {
 		google()
