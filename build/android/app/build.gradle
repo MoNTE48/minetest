@@ -75,10 +75,13 @@ task prepareAssets() {
 	copy {
 		from "${projRoot}/games/${gameToCopy}" into "${assetsFolder}/games/${gameToCopy}"
 	}
-	/*copy {
+	copy {
 		// ToDo: fix broken locales
-		from "${projRoot}/po" into "${assetsFolder}/po"
-	}*/
+		from "${projRoot}/po" include "*/*.po" into "${assetsFolder}/po"
+		filter {
+			(it.contains('#') || it.startsWith('"')) ? null : it
+		}
+	}
 	copy {
 		from "${projRoot}/textures" into "${assetsFolder}/textures"
 	}
