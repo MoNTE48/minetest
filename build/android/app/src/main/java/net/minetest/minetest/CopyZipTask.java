@@ -56,7 +56,9 @@ public class CopyZipTask extends AsyncTask<String, Void, String> {
 			 OutputStream out = new FileOutputStream(zipName)) {
 			copyFile(in, out);
 		} catch (IOException e) {
-			activityRef.get().runOnUiThread(() -> Toast.makeText(activityRef.get(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show());
+			if (activityRef.get() != null) {
+				activityRef.get().runOnUiThread(() -> Toast.makeText(activityRef.get(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show());
+			}
 			cancel(true);
 		}
 	}
@@ -71,6 +73,8 @@ public class CopyZipTask extends AsyncTask<String, Void, String> {
 	private void startUnzipService(String file) {
 		Intent intent = new Intent(activityRef.get(), UnzipService.class);
 		intent.putExtra(UnzipService.EXTRA_KEY_IN_FILE, file);
-		activityRef.get().startService(intent);
+		if (activityRef.get() != null) {
+			activityRef.get().startService(intent);
+		}
 	}
 }
