@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static net.minetest.minetest.UnzipService.ACTION_FAILURE;
 import static net.minetest.minetest.UnzipService.ACTION_PROGRESS;
 import static net.minetest.minetest.UnzipService.ACTION_UPDATE;
 import static net.minetest.minetest.UnzipService.FAILURE;
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
 				}
 				mTextView.setVisibility(View.VISIBLE);
 			} else if (progress == FAILURE) {
+				Toast.makeText(MainActivity.this, intent.getStringExtra(ACTION_FAILURE), Toast.LENGTH_LONG).show();
 				finish();
 			} else if (progress == SUCCESS)
 				startNative();
