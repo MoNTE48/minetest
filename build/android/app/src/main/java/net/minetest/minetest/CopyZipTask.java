@@ -53,10 +53,10 @@ public class CopyZipTask extends AsyncTask<String, Void, String> {
 	private void copyAsset(String zipName) {
 		String filename = zipName.substring(zipName.lastIndexOf("/") + 1);
 		try (InputStream in = activityRef.get().getAssets().open(filename);
-			 OutputStream out = new FileOutputStream(zipName)) {
+		     OutputStream out = new FileOutputStream(zipName)) {
 			copyFile(in, out);
 		} catch (IOException e) {
-		    AppCompatActivity activity = activityRef.get();
+			AppCompatActivity activity = activityRef.get();
 			if (activity != null) {
 				activity.runOnUiThread(() -> Toast.makeText(activityRef.get(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show());
 			}

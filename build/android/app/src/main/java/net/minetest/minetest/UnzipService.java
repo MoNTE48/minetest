@@ -50,6 +50,7 @@ public class UnzipService extends IntentService {
 	private NotificationManager mNotifyManager;
 	private boolean isSuccess = true;
 	private String failureMessage;
+
 	public UnzipService() {
 		super("net.minetest.minetest.UnzipService");
 	}
@@ -106,7 +107,7 @@ public class UnzipService extends IntentService {
 		int readLen;
 		byte[] readBuffer = new byte[8192];
 		try (FileInputStream fileInputStream = new FileInputStream(zipFile);
-             ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
+		     ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
 			ZipEntry ze;
 			while ((ze = zipInputStream.getNextEntry()) != null) {
 				if (ze.isDirectory()) {

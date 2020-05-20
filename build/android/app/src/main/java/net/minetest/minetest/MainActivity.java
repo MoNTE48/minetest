@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	public void onBackPressed() {
-        // Prevent abrupt interruption when copy game files from assets
+		// Prevent abrupt interruption when copy game files from assets
 	}
 
 	@Override
