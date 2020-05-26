@@ -57,8 +57,8 @@ public class UnzipService extends IntentService {
 
 	private void isDir(String dir, String location) {
 		File f = new File(location + dir);
-		if (!f.isDirectory())
-			f.mkdirs();
+		if (!f.mkdirs() && !f.isDirectory())
+			Toast.makeText(this, f + " dir is not created!", Toast.LENGTH_LONG).show();
 	}
 
 	@Override
@@ -100,7 +100,9 @@ public class UnzipService extends IntentService {
 
 	private void unzip(Intent intent) {
 		String zip = intent.getStringExtra(EXTRA_KEY_IN_FILE);
-		String location = Environment.getExternalStorageDirectory() + "/Minetest/";
+		String location =  Environment.getExternalStorageDirectory() +
+				File.separator + "Minetest" + File.separator;
+		isDir("", location);
 		int per = 0;
 		int size = getSummarySize(zip);
 		File zipFile = new File(zip);
